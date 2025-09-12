@@ -96,47 +96,43 @@ export default function Logs() {
 
       {/* Issues List */}
       <div className="relative z-10 pt-32 pb-12 px-4 max-w-6xl mx-auto">
-        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-6">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <FileText className="text-gray-600" size={28} />
+        <div style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)' }} className="rounded-2xl shadow-lg p-6">
+          <h1 className="text-3xl font-bold text-white mb-6 flex items-center gap-2">
+            <FileText className="text-white" size={28} />
             Your Submitted Issues
           </h1>
-          
           {issues.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <AlertCircle className="mx-auto mb-4" size={48} />
+            <div className="text-center py-12 text-white">
+              <AlertCircle className="mx-auto mb-4 text-white" size={48} />
               <p>No issues submitted yet.</p>
             </div>
           ) : (
             <div className="grid gap-4">
               {issues.map((issue) => (
-                <div key={issue.id} className="border rounded-xl p-4 hover:shadow-md transition-shadow">
+                <div key={issue.id} className="border rounded-xl p-4 hover:shadow-md transition-shadow" style={{ background: 'rgba(255,255,255,0.05)' }}>
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-semibold text-gray-800">{issue.title}</h3>
+                    <h3 className="text-xl font-semibold text-white">{issue.title}</h3>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(issue.priority)}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium`} style={{ background: 'rgba(255,255,255,0.2)', color: '#fff' }}>
                         {issue.priority}
                       </span>
-                      <span className="text-lg">{getCategoryIcon(issue.category)}</span>
+                      <span className="text-lg text-white">{getCategoryIcon(issue.category)}</span>
                     </div>
                   </div>
-                  
-                  <p className="text-gray-600 mb-4">{issue.description}</p>
-                  
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                  <p className="text-white mb-4">{issue.description}</p>
+                  <div className="flex flex-wrap gap-4 text-sm text-white">
                     <div className="flex items-center gap-1">
-                      <Calendar size={16} />
+                      <Calendar size={16} className="text-white" />
                       <span>{issue.timestamp}</span>
                     </div>
-                    
                     {issue.ipfsHash && (
                       <a
                         href={`https://gateway.pinata.cloud/ipfs/${issue.ipfsHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+                        className="flex items-center gap-1 text-blue-200 hover:text-blue-400"
                       >
-                        <ExternalLink size={16} />
+                        <ExternalLink size={16} className="text-white" />
                         View attached file
                       </a>
                     )}

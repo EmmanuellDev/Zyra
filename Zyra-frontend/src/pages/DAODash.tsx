@@ -39,18 +39,19 @@ const db = getDatabase(app);
 export default function DAODash() {
   // Modal state for AIChat
   const [showAIChat, setShowAIChat] = useState(false);
-  const [selectedIssueId, setSelectedIssueId] = useState<string | number | null>(null);
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
   // Handler for Ask AI Zyra button
   const handleAskAI = (issueId: string | number) => {
-    setSelectedIssueId(issueId);
+    const issue = issues.find(i => i.id === issueId);
+    setSelectedIssue(issue || null);
     setShowAIChat(true);
   };
 
   // Handler to close AIChat modal
   const handleCloseAIChat = () => {
     setShowAIChat(false);
-    setSelectedIssueId(null);
+    setSelectedIssue(null);
   };
   const [issues, setIssues] = useState<Issue[]>([]);
   const [walletAddress, setWalletAddress] = useState("");
@@ -195,7 +196,7 @@ export default function DAODash() {
           top: 0,
           left: 0,
           width: '100%',
-          height: '100%',
+          height: '150%',
           zIndex: 0,
         }}
       >
@@ -220,25 +221,25 @@ export default function DAODash() {
 
       {/* Issues List */}
       <div className="relative z-10 pt-32 pb-12 px-4 max-w-6xl mx-auto">
-        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-6">
+  <div style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)' }} className="rounded-2xl shadow-lg p-6">
           <div className="flex items-center gap-4 mb-6">
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-              <FileText className="text-gray-600" size={28} />
+            <h1 className="text-3xl font-bold text-white flex items-center gap-2">
+              <FileText className="text-white" size={28} />
               Submitted Issues
             </h1>
             {walletAddress && (
               <div className="flex items-center gap-2">
-                <span className="text-gray-600">|</span>
-                <span className="text-sm font-medium">
+                <span className="text-white">|</span>
+                <span className="text-sm font-medium text-white">
                   Your Voting Power = {isLoadingBalance ? (
-                    <span className="inline-block animate-spin w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full"></span>
+                    <span className="inline-block animate-spin w-4 h-4 border-2 border-white border-t-blue-500 rounded-full"></span>
                   ) : (
                     `${balance !== null ? Math.round(balance) : 'N/A'} ALGO`
                   )}
                 </span>
                 <button
                   onClick={() => walletAddress && fetchBalance(walletAddress)}
-                  className="text-blue-500 hover:text-blue-700 text-xs underline"
+                  className="text-white hover:text-blue-200 text-xs underline"
                   disabled={isLoadingBalance}
                 >
                   {isLoadingBalance ? 'Updating...' : 'Refresh'}
@@ -248,56 +249,76 @@ export default function DAODash() {
           </div>
           
           {issues.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <AlertCircle className="mx-auto mb-4" size={48} />
+            <div className="text-center py-12 text-white">
+              <AlertCircle className="mx-auto mb-4 text-white" size={48} />
               <p>No issues submitted yet.</p>
             </div>
           ) : (
             <div className="grid gap-4">
               {issues.map((issue) => (
-                <div key={issue.id} className="border rounded-xl p-4 hover:shadow-md transition-shadow">
+                <div key={issue.id} className="border rounded-xl p-4 hover:shadow-md transition-shadow" style={{ background: 'rgba(255,255,255,0.05)' }}>
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-xl font-semibold text-gray-800">{issue.title}</h3>
+                      <h3 className="text-xl font-semibold text-white">{issue.title}</h3>
                       <button
                         className="ask-ai-zyra-btn"
-                        style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', background: '#6c63ff', color: '#fff', border: 'none', cursor: 'pointer' }}
+                        style={{
+                          padding: '0.4rem 1rem',
+                          borderRadius: '6px',
+                          background: 'rgba(0,0,0,0.85)',
+                          color: '#fff',
+                          border: '1px solid #fff',
+                          fontWeight: 'bold',
+                          letterSpacing: '0.5px',
+                          fontSize: '1rem',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s, color 0.2s',
+                        }}
                         onClick={() => handleAskAI(issue.id)}
+                        onMouseOver={e => {
+                          (e.currentTarget as HTMLButtonElement).style.background = '#fff';
+                          (e.currentTarget as HTMLButtonElement).style.color = '#000';
+                        }}
+                        onMouseOut={e => {
+                          (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.85)';
+                          (e.currentTarget as HTMLButtonElement).style.color = '#fff';
+                        }}
                       >
                         Ask AI Zyra
                       </button>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(issue.priority)}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium`} style={{ background: 'rgba(255,255,255,0.2)', color: '#fff' }}>
                         {issue.priority}
                       </span>
-                      <span className="text-lg">{getCategoryIcon(issue.category)}</span>
+                      <span className="text-lg text-white">{getCategoryIcon(issue.category)}</span>
                     </div>
                   </div>
                   
-                  <p className="text-gray-600 mb-4">{issue.description}</p>
+                  <p className="text-white mb-4">{issue.description}</p>
                   
                   {/* Voting Status and Stats */}
-                  <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                  <div className="mb-4 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.08)' }}>
                     <div className="flex justify-between items-center mb-2">
                       <div className="flex items-center gap-2">
-                        <Vote size={16} className="text-gray-600" />
-                        <span className="text-sm font-medium text-gray-700">Voting Status:</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(issue.votingStatus || 'pending')}`}>
+                        <Vote size={16} className="text-white" />
+                        <span className="text-sm font-medium text-white">Voting Status:</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium`} style={{ background: 'rgba(255,255,255,0.2)', color: '#fff' }}>
                           {(issue.votingStatus || 'pending').charAt(0).toUpperCase() + (issue.votingStatus || 'pending').slice(1)}
                         </span>
                       </div>
                       {issue.votes && (
                         <div className="flex items-center gap-4 text-sm">
-                          <div className="flex items-center gap-1 text-green-600">
+                          <div className="flex items-center gap-1" style={{ color: '#fff' }}>
                             <ThumbsUp size={14} />
                             <span>{issue.votes.approve || 0}</span>
                           </div>
-                          <div className="flex items-center gap-1 text-red-600">
+                          <div className="flex items-center gap-1" style={{ color: '#fff' }}>
                             <ThumbsDown size={14} />
                             <span>{issue.votes.reject || 0}</span>
                           </div>
-                          <div className="flex items-center gap-1 text-gray-600">
+                          <div className="flex items-center gap-1" style={{ color: '#fff' }}>
                             <Users size={14} />
                             <span>{issue.votes.voters ? issue.votes.voters.length : 0}</span>
                           </div>
@@ -308,8 +329,8 @@ export default function DAODash() {
                     {/* Voting Buttons */}
                     <div className="flex gap-2">
                       {hasUserVoted(issue) ? (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <CheckCircle size={16} className="text-green-600" />
+                        <div className="flex items-center gap-2 text-sm text-white">
+                          <CheckCircle size={16} className="text-green-300" />
                           <span>You have already voted on this issue</span>
                         </div>
                       ) : (
@@ -335,9 +356,9 @@ export default function DAODash() {
                     </div>
                   </div>
                   
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                  <div className="flex flex-wrap gap-4 text-sm text-white">
                     <div className="flex items-center gap-1">
-                      <Calendar size={16} />
+                      <Calendar size={16} className="text-white" />
                       <span>{issue.timestamp}</span>
                     </div>
                     <span className="issue-id">{issue.id}</span>
@@ -346,9 +367,9 @@ export default function DAODash() {
                         href={`https://gateway.pinata.cloud/ipfs/${issue.ipfsHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+                        className="flex items-center gap-1 text-blue-200 hover:text-blue-400"
                       >
-                        <ExternalLink size={16} />
+                        <ExternalLink size={16} className="text-white" />
                         View attached file
                       </a>
                     )}
@@ -361,7 +382,7 @@ export default function DAODash() {
       </div>
 
       {/* AIChat Modal Overlay */}
-      {showAIChat && (
+      {showAIChat && selectedIssue && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -379,9 +400,12 @@ export default function DAODash() {
             borderRadius: '16px',
             boxShadow: '0 4px 32px rgba(0,0,0,0.2)',
             padding: '2rem',
-            maxWidth: '600px',
-            width: '100%',
+            maxWidth: '900px',
+            width: '80vw',
+            height: '90vh',
             position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
           }}>
             <button
               style={{
@@ -398,7 +422,10 @@ export default function DAODash() {
             >
               &times;
             </button>
-            <AIChat onBackToHome={handleCloseAIChat} />
+            <AIChat
+              onBackToHome={handleCloseAIChat}
+              initialInput={"Hi Zyra, Analyse the below Issue...\n" + selectedIssue.title + "\n" + selectedIssue.description}
+            />
           </div>
         </div>
       )}

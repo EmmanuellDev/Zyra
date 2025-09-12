@@ -25,8 +25,8 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Configure CORS
-cors_origins = os.getenv('CORS_ORIGINS', 'http://localhost:5173').split(',')
-CORS(app, origins=cors_origins)
+cors_origins = os.getenv('CORS_ORIGINS', '*').split(',')
+CORS(app, origins=cors_origins, methods=['GET', 'POST', 'OPTIONS'], allow_headers=['Content-Type'])
 
 # Configure Groq client
 groq_client = None
