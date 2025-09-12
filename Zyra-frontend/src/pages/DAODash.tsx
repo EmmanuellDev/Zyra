@@ -1,5 +1,6 @@
 import Beams from '../components/Beams';
 import { useState, useEffect } from 'react';
+import AIChat from '../components/AIChat';
 
 // Issue type definition
 interface Issue {
@@ -36,6 +37,21 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 export default function DAODash() {
+  // Modal state for AIChat
+  const [showAIChat, setShowAIChat] = useState(false);
+  const [selectedIssueId, setSelectedIssueId] = useState<string | number | null>(null);
+
+  // Handler for Ask AI Zyra button
+  const handleAskAI = (issueId: string | number) => {
+    setSelectedIssueId(issueId);
+    setShowAIChat(true);
+  };
+
+  // Handler to close AIChat modal
+  const handleCloseAIChat = () => {
+    setShowAIChat(false);
+    setSelectedIssueId(null);
+  };
   const [issues, setIssues] = useState<Issue[]>([]);
   const [walletAddress, setWalletAddress] = useState("");
   const [votingStates, setVotingStates] = useState<{ [key: string]: boolean }>({});
@@ -241,7 +257,16 @@ export default function DAODash() {
               {issues.map((issue) => (
                 <div key={issue.id} className="border rounded-xl p-4 hover:shadow-md transition-shadow">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-semibold text-gray-800">{issue.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xl font-semibold text-gray-800">{issue.title}</h3>
+                      <button
+                        className="ask-ai-zyra-btn"
+                        style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', background: '#6c63ff', color: '#fff', border: 'none', cursor: 'pointer' }}
+                        onClick={() => handleAskAI(issue.id)}
+                      >
+                        Ask AI Zyra
+                      </button>
+                    </div>
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(issue.priority)}`}>
                         {issue.priority}
@@ -315,7 +340,7 @@ export default function DAODash() {
                       <Calendar size={16} />
                       <span>{issue.timestamp}</span>
                     </div>
-                    
+                    <span className="issue-id">{issue.id}</span>
                     {issue.ipfsHash && (
                       <a
                         href={`https://gateway.pinata.cloud/ipfs/${issue.ipfsHash}`}
@@ -334,6 +359,49 @@ export default function DAODash() {
           )}
         </div>
       </div>
+
+      {/* AIChat Modal Overlay */}
+      {showAIChat && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: '16px',
+            boxShadow: '0 4px 32px rgba(0,0,0,0.2)',
+            padding: '2rem',
+            maxWidth: '600px',
+            width: '100%',
+            position: 'relative',
+          }}>
+            <button
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '1.5rem',
+                cursor: 'pointer',
+              }}
+              onClick={handleCloseAIChat}
+              aria-label="Close AI Chat"
+            >
+              &times;
+            </button>
+            <AIChat onBackToHome={handleCloseAIChat} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

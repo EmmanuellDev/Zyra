@@ -315,6 +315,6 @@ const AIChat: React.FC<AIChatProps> = ({ onBackToHome }) => {
       </motion.div>
     </div>
   );
-};
+}; 
 
 export default AIChat;
